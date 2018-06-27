@@ -22,6 +22,7 @@
 // ***********************************************************************
 
 using System;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Security;
@@ -54,6 +55,7 @@ namespace NUnit.Agent
             int pid = Process.GetCurrentProcess().Id;
             bool debugArgPassed = false;
             string workDirectory = string.Empty;
+            string agencyPid = string.Empty;
 
             for (int i = 2; i < args.Length; i++)
             {
@@ -71,8 +73,7 @@ namespace NUnit.Agent
                 }
                 else if (arg.StartsWith("--pid="))
                 {
-                    int agencyProcessId = int.Parse(arg.Substring(6));
-                    AgencyProcess = Process.GetProcessById(agencyProcessId);
+                    agencyPid = arg.Substring(6);
                 }
                 else if (arg.StartsWith("--work="))
                 {
@@ -86,6 +87,31 @@ namespace NUnit.Agent
 
             if (debugArgPassed)
                 TryLaunchDebugger();
+
+            int agencyProcessId = int.Parse(agencyPid);
+            try
+            {
+                AgencyProcess = Process.GetProcessById(agencyProcessId);
+            }
+            catch (Exception e)
+            {
+                log.Error($"Unable to connect to agency process with PID: {agencyProcessId}");
+                log.Error($"Failed with exception: {e.Message} {e.StackTrace}");
+
+                //Note that agents won't always be called from the process, but this may help debug a specific issue
+                try
+                {
+                    var consoleProcesses = Process.GetProcessesByName("nunit3-console");
+                    foreach (var process in consoleProcesses)
+                        log.Error($"Found console process with ID: {process.Id}");
+                }
+                catch (Exception e2)
+                {
+                    log.Error($"Unable to look for console processes: {e2.Message} {e2.StackTrace}");
+                }
+
+                Environment.Exit(AgentExitCodes.UNABLE_TO_LOCATE_AGENCY);
+            }
 
             log.Info("Agent process {0} starting", pid);
             log.Info("Running under version {0}, {1}",
