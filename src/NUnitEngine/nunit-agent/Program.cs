@@ -91,7 +91,9 @@ namespace NUnit.Agent
             int agencyProcessId = int.Parse(agencyPid);
             try
             {
+                log.Info($"Attempting to find agency process: {agencyProcessId}");
                 AgencyProcess = Process.GetProcessById(agencyProcessId);
+                log.Info($"Handle obtained for agency process: {AgencyProcess.Id}");
             }
             catch (Exception e)
             {
