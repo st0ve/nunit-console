@@ -256,15 +256,22 @@ namespace NUnit.Engine.Services
             int pollTime = 200;
             bool infinite = waitTime == Timeout.Infinite;
 
-            while( infinite || waitTime > 0 )
+            var agentRecord = _agentData[agentId];
+            var agentProcess = agentRecord.Process;
+
+            //Wait for agent registration based on the agent actually getting processor time - to avoid falling over under process starvation
+            //This change for debug purposes only - don't expect to use this in master!
+            while(infinite || waitTime > agentProcess.TotalProcessorTime.TotalMilliseconds)
             {
-                Thread.Sleep( pollTime );
-                if ( !infinite ) waitTime -= pollTime;
-                var agentRecord = _agentData[agentId];
-                
-                if ( agentRecord.Agent != null )
+                Thread.Sleep(pollTime);
+                if (!infinite)
                 {
-                    log.Debug( "Returning new agent {0}", agentId.ToString("B") );
+                    waitTime -= pollTime;
+                }
+                
+                if (agentRecord.Agent != null)
+                {
+                    log.Debug("Returning new agent {0}", agentId.ToString("B"));
                     return new RemoteTestAgentProxy(agentRecord.Agent, agentRecord.Id);
                 }
             }

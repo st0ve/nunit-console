@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "nunit3-console": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\Chris\\Documents\\git\\nunit-console\\bin\\Debug\\net35\\nunit3-console.tests.dll\" \"C:\\Users\\Chris\\Documents\\git\\nunit-console\\bin\\Debug\\net35\\nunit3-console.tests.dll\" \"C:\\Users\\Chris\\Documents\\git\\nunit-console\\bin\\Debug\\net35\\nunit.engine.tests.dll\""
+    }
+  }
+}
