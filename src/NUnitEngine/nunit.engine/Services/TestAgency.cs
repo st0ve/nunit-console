@@ -261,13 +261,9 @@ namespace NUnit.Engine.Services
 
             //Wait for agent registration based on the agent actually getting processor time - to avoid falling over under process starvation
             //This change for debug purposes only - don't expect to use this in master!
-            while(infinite || waitTime > agentProcess.TotalProcessorTime.TotalMilliseconds)
+            while(waitTime > agentProcess.TotalProcessorTime.TotalMilliseconds)
             {
                 Thread.Sleep(pollTime);
-                if (!infinite)
-                {
-                    waitTime -= pollTime;
-                }
                 
                 if (agentRecord.Agent != null)
                 {
